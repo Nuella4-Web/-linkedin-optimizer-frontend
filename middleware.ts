@@ -2,33 +2,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Protected routes that require authentication
-const PROTECTED_PATHS = ['/analyze', '/results']
-
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-
-  const isProtected = PROTECTED_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`)
-  )
-
-  if (!isProtected) {
-    return NextResponse.next()
-  }
-
-  // Check for refresh_token cookie as a proxy for authentication
-  // (access token is in-memory and not available in middleware)
-  const refreshToken = request.cookies.get('refresh_token')
-
-  if (!refreshToken) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('from', pathname)
-    return NextResponse.redirect(loginUrl)
-  }
-
+  // Let all requests through - auth is handled client-side
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/analyze/:path*', '/results/:path*'],
+  matcher: [],
 }
